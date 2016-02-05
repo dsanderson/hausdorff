@@ -1,0 +1,7 @@
+[package]
+name = "hausdorff"
+version = "0.1.0"
+authors = ["David Anderson <the.real.david.anderson@gmail.com>"]
+
+[dependencies]
+csv = "0.14.3"
