@@ -1,6 +1,7 @@
 use std::f64;
 use std::io;
 use std::io::prelude::*;
+use std::fmt;
 use std::fs::File;
 use std::path::Path;
 
@@ -9,6 +10,11 @@ extern crate csv;
 struct Point {
     x: f64,
     y: f64,
+}
+
+struct Score {
+    index: i32,
+    score: f64,
 }
 
 fn dist(p1:&Point, p2:&Point) -> f64 {
@@ -52,24 +58,32 @@ fn import_path(file_path:&Path) -> Vec<Point> {
     path
 }
 
-fn get_path_files(folder:&str) -> Vec<String> {
-    let v = vec!["unimplemented".to_string()];
-    v
-}
-
 fn print_path(path:&[Point]) {
     for p in path {
         println!("  x:{}\ty:{}",p.x,p.y);
     }
 }
 
+fn export_scores(scores: &[Score]) {
+    let mut writer = csv::Writer::from_file("scoring.csv").unwrap();
+    for row in scores {
+        let datum: (i32, f64) = (row.index, row.score);
+        writer.encode(datum).expect("CSV writer error");
+    }
+}
+
 fn main() {
+    //vector to store scores
+    let mut scores: Vec<Score> = Vec::new();
     //points to test
-    let fname = Path::new("path1.csv");
+    let fname = Path::new("./data/9_path.csv"); //Path::new("path1.csv");
     let v1 = import_path(&fname); //vec![Point{x:1.0,y:1.0}];
-    let v2 = vec![Point{x:1.0,y:1.0}];
     println!("length of vector 1: {}",  v1.len());
     print_path(&v1);
-    let d = hausdorff_dist(&v1,&v2);
-    println!("{}",d);
+    for i in 0..168 {
+        let v2 = import_path(&Path::new(&format!("./data/{}_path.csv",i as i32)));
+        let d = hausdorff_dist(&v1,&v2);
+        scores.push( Score {index: i as i32, score: d} );
+        export_scores(&scores);
+    }
 }
